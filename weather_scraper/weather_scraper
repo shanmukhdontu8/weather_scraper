@@ -1,0 +1,97 @@
+#!/usr/bin/python3
+
+from weather_scraper import get_location_search, get_today, get_5_day, get_10_day, get_weekends, get_month, get_weather_date, print_calender, print_turbo_data, print_dates, get_turbo_data_hourly, get_turbo_data_15_mins, print_date_time 
+from datetime import datetime
+
+def select_location():
+    print("Enter location search string: ")
+    query = input()
+    loc_list = get_location_search(query)
+    if not loc_list:
+        return None
+    print("Select a Location:")
+
+    for i,loc in enumerate(loc_list):
+        print(str(i+1)+") "+loc[0])
+
+    choice = int(input())
+    if choice < 1 or choice > len(loc_list):
+        print("Invalid location number")
+        return select_location()
+    
+    return loc_list[choice-1]
+
+def select_forecast_type(address, lat, long, timez):
+    print("Select Forecast Type:")
+    
+    FORECAST_TYPES = ["Today","Hourly", "15 minutes", "5 Days", "10 Days", "Weekend", "Montly", "Custom"]
+
+    for i, for_type in enumerate(FORECAST_TYPES):
+        print(str(i+1)+") "+for_type)
+    
+    choice = int(input())
+
+    if choice < 1 or choice > len(FORECAST_TYPES):
+        print("Invalid Type Number")
+        return select_forecast_type(address, lat, long, timez)
+
+    choice = choice-1
+
+    if choice == 0:
+        data = get_today(lat,long)
+        print_turbo_data(data)
+    elif choice == 1:
+        data = get_turbo_data_hourly(lat,long)
+        print_date_time(data)
+    elif choice == 2:
+        data = get_turbo_data_15_mins(lat,long)
+        print_date_time(data)
+    elif choice == 3:
+        data = get_5_day(lat,long)
+        print_turbo_data(data)
+    elif choice == 4:
+        data = get_10_day(lat,long)
+        print_turbo_data(data)
+    elif choice == 5:
+        data = get_weekends(lat,long)
+        print_turbo_data(data)
+    elif choice == 6:
+        print("Enter Year in YYYY format")
+        year = int(input())
+        if year < 2014 or year > 2020:
+            print("Year must be between 2014 and 2020")
+            return select_forecast_type(address, lat, long, timez)
+        print("Enter Month in MM format")
+        month = int(input())
+        if month < 1 or month > 12:
+            print("Not a valid Month")
+            return select_forecast_type(address, lat, long, timez)
+        print_calender(year, month, lat, long, timez, width = 15)
+
+    else:
+        print("Enter Starting Date in YYYY/MM/DD format")
+        start_dt_str = input()
+        try:
+            start_dt = datetime.strptime(start_dt_str, "%Y/%m/%d")
+            start_dt = start_dt.replace(tzinfo = timez)
+        except ValueError:
+            print("Entered date in not Valid")
+            select_forecast_type(address,lat,long,timez)
+        year = start_dt.year
+        if year < 2014 or year > 2020:
+            print("Year must be between 2014 and 2020")
+            return select_forecast_type(address, lat, long, timez)        
+        print("Enter number of days")
+        num_days = int(input())
+        if num_days < 1 or num_days > 50:
+            print("Number of days should be atleast 1 and atmost 50")
+            return select_forecast_type(address, lat, long, timez)
+        data = get_weather_date(start_dt, lat, long, timezone = timez, num_days=num_days)
+        print_dates(data)
+
+def main():
+    address, lat, long, timez = select_location()
+    select_forecast_type(address,lat,long,timez)
+
+if __name__ == "__main__":
+    main()
