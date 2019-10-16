@@ -126,8 +126,8 @@ def print_calender(year, month, lat, long, timezone = None, width = 12):
     print("\n")
     print(cal.formatweekheader(width))
 
-    min_strs = [" ".join(["Min :",str(x["temp_lo"])+ u"\u00b0C"]).center(width) for x in data]
-    max_strs = [" ".join(["Max :",str(x["temp_hi"])+ u"\u00b0C"]).center(width) for x in data]
+    min_strs = [" ".join(["Min :",str(x["temp_lo"] if x["temp_lo"] else "")+ u"\u00b0C"]).center(width) for x in data]
+    max_strs = [" ".join(["Max :",str(x["temp_hi"] if x["temp_hi"] else "")+ u"\u00b0C"]).center(width) for x in data]
     print("\n")
 
     if start_week > 0:
@@ -150,6 +150,11 @@ def print_dates(data, width = 20):
     print("+".join( ["-"*width]*3))
     for x in data:
         date_str = x["date"].strftime("%Y/%m/%d").center(width)
+        
+        for key in ["temp_lo","temp_hi"]:
+            if not x[key]:
+                x[key] = ""
+
         low_temp = (str(x["temp_lo"])+ u"\u00b0C").center(width)
         high_temp = (str(x["temp_hi"])+ u"\u00b0C").center(width)
         print("|".join([date_str, high_temp, low_temp]))
@@ -165,6 +170,12 @@ def print_turbo_data(data, temp_width = 15, phrase_width = 40):
 
     for x in data:
         date_str = x["validDate"].strftime("%Y/%m/%d").center(20)
+
+        for key1 in ["day","night"]:
+            for key2 in ["temperature","phrase","windSpeed"]:
+                if not x[key1][key2]:
+                    x[key1][key2] = ""
+
         day_str = "|".join([(str(x["day"]["temperature"])+u"\u00b0C").center(temp_width),x["day"]["phrase"].center(phrase_width),(str(x["day"]["windSpeed"])+" km/h").center(temp_width)])
         night_str = "|".join([(str(x["night"]["temperature"])+u"\u00b0C").center(temp_width),x["night"]["phrase"].center(phrase_width),(str(x["night"]["windSpeed"])+" km/h").center(temp_width)])
 
@@ -176,6 +187,11 @@ def print_date_time(data, width = 30):
 
     for x in data:
         date_str = x["processTime"].strftime("%Y/%m/%d, %I:%M:%S %p").center(width)
+        
+        for key in ["temperature","windSpeed"]:
+            if not x[key]:
+                x[key] = ""
+
         temp_str = (str(x["temperature"])+"\u00b0C").center(width)
         wind_str = (str(x["windSpeed"])+" km/h").center(width)
         
