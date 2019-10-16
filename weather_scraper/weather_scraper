@@ -23,7 +23,7 @@ def select_location():
 
 def select_forecast_type(address, lat, long, timez):
     print("Select Forecast Type:")
-    
+    import ipdb; ipdb.set_trace()    
     FORECAST_TYPES = ["Today","Hourly", "15 minutes", "5 Days", "10 Days", "Weekend", "Montly", "Custom"]
 
     for i, for_type in enumerate(FORECAST_TYPES):
